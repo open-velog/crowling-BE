@@ -21,12 +21,12 @@ public class Blog extends TimeStamped{
     @Column(nullable = false)
     private String link;
     @Column(nullable = false)
-    private String description;
+    private String descriptions;
 
     public Blog (String title, String link, String description) {
         this.title = title;
         this.link = link;
-        this.description = description;
+        this.descriptions = description;
     }
 
 }
