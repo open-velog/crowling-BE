@@ -1,7 +1,7 @@
 package com.example.finding.service;
 
-import com.example.finding.entity.Blog;
-import com.example.finding.repository.BlogRepository;
+import com.example.finding.entity.Board;
+import com.example.finding.repository.BoardRepository;
 import com.example.finding.dto.ItemsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class NaverApiService {
-    private final BlogRepository blogRepository;
+    private final BoardRepository boardRepository;
     @Transactional
     public List<ItemsDto> searchItems(String query) {
 
@@ -51,7 +51,7 @@ public class NaverApiService {
         for (int i=0; i<items.length(); i++) {
             JSONObject itemJson = items.getJSONObject(i);
             ItemsDto itemsDto = new ItemsDto(itemJson);
-            blogRepository.save(Blog.create(itemsDto));
+            boardRepository.save(Board.create(itemsDto));
             itemsDtoList.add(itemsDto);
         }
         return itemsDtoList;

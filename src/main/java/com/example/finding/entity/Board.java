@@ -5,12 +5,12 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Entity(name = "blog")
+@Entity(name = "board")
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Blog extends TimeStamped{
+public class Board extends TimeStamped{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,8 +21,8 @@ public class Blog extends TimeStamped{
     @Column(nullable = false)
     private String content;
 
-    public static Blog create(ItemsDto itemsDto) {
-        return Blog.builder()
+    public static Board create(ItemsDto itemsDto) {
+        return Board.builder()
                 .title(itemsDto.getTitle())
                 .link(itemsDto.getLink())
                 .content(itemsDto.getContent())
