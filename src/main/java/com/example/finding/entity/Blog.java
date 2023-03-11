@@ -1,15 +1,13 @@
 package com.example.finding.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.example.finding.dto.ItemsDto;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity(name = "blog")
 @Getter
-@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Blog extends TimeStamped{
@@ -21,12 +19,15 @@ public class Blog extends TimeStamped{
     @Column(nullable = false)
     private String link;
     @Column(nullable = false)
-    private String descriptions;
+    private String content;
 
-    public Blog (String title, String link, String description) {
-        this.title = title;
-        this.link = link;
-        this.descriptions = description;
+    public static Blog create(ItemsDto itemsDto) {
+        return Blog.builder()
+                .title(itemsDto.getTitle())
+                .link(itemsDto.getLink())
+                .content(itemsDto.getContent())
+                .build();
     }
+
 
 }

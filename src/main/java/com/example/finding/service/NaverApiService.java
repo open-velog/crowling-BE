@@ -51,12 +51,9 @@ public class NaverApiService {
         for (int i=0; i<items.length(); i++) {
             JSONObject itemJson = items.getJSONObject(i);
             ItemsDto itemsDto = new ItemsDto(itemJson);
-            Blog blog = new Blog(itemsDto.getTitle().replaceAll("<[^>]*>", " "),
-                    itemsDto.getLink(), itemsDto.getDescription().replaceAll("<[^>]*>", " "));
-            blogRepository.save(blog);
+            blogRepository.save(Blog.create(itemsDto));
             itemsDtoList.add(itemsDto);
         }
-
         return itemsDtoList;
     }
 
