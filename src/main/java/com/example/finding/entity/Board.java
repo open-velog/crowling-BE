@@ -28,6 +28,11 @@ public class Board extends TimeStamped{
                 .content(itemsDto.getContent())
                 .build();
     }
+    public Board (String title, String link, String content){
+        this.title = title;
+        this.link = link;
+        this.content = content;
+    }
 
 
 }

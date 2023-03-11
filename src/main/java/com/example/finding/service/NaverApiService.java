@@ -1,8 +1,11 @@
 package com.example.finding.service;
 
 import com.example.finding.entity.Board;
+import com.example.finding.entity.Keyword;
 import com.example.finding.repository.BoardRepository;
 import com.example.finding.dto.ItemsDto;
+import com.example.finding.repository.KeywordRepository;
+import com.example.finding.utils.DeduplicationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
@@ -13,48 +16,59 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class NaverApiService {
     private final BoardRepository boardRepository;
-    @Transactional
-    public List<ItemsDto> searchItems(String query) {
 
+    private final KeywordRepository keywordRepository;
+    @Transactional
+    public void searchItems() {
         RestTemplate rest = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Naver-Client-Id", "wyCvLvhOWDeW6BC20eNt");
         headers.add("X-Naver-Client-Secret", "gWTeNvJoWW");
         String body = "";
 
-        HttpEntity<String> requestEntity = new HttpEntity<String>(body, headers);
-        ResponseEntity<String> responseEntity = rest.exchange("https://openapi.naver.com/v1/search/blog.json?display=100&query=" + query , HttpMethod.GET, requestEntity, String.class);
+        List<Keyword> keywordList = keywordRepository.findByIdBetween(2L,100L);
+        for (Keyword keyword:keywordList){
+            List<Board> boards=boardRepository.findAll();
+            Set<String> links = new HashSet<>();
+            for (Board board : boards){
+                links.add(board.getLink());
+            }
+            HttpEntity<String> requestEntity = new HttpEntity<String>(body, headers);
+            ResponseEntity<String> responseEntity = rest.exchange("https://openapi.naver.com/v1/search/blog.json?display=100&query=" + keyword.getKeyword(), HttpMethod.GET, requestEntity, String.class);
 
-        HttpStatus httpStatus = responseEntity.getStatusCode();
-        int status = httpStatus.value();
-        log.info("NAVER API Status Code : " + status);
+            HttpStatus httpStatus = responseEntity.getStatusCode();
+            int status = httpStatus.value();
+            log.info("NAVER API Status Code : " + status);
 
-        String response = responseEntity.getBody();
-
-        return fromJSONtoItems(response);
+            String response = responseEntity.getBody();
+            fromJSONtoItems(response, links);
+        }
     }
 
     //파싱 파트
-    public List<ItemsDto> fromJSONtoItems(String response) {
-
+    public void fromJSONtoItems(String response, Set<String> links) {
         JSONObject rjson = new JSONObject(response);
         JSONArray items  = rjson.getJSONArray("items");
-        List<ItemsDto> itemsDtoList = new ArrayList<>();
-
+        List<Board> boardList = new ArrayList<>();
+        log.info(""+items.length());
         for (int i=0; i<items.length(); i++) {
             JSONObject itemJson = items.getJSONObject(i);
             ItemsDto itemsDto = new ItemsDto(itemJson);
-            boardRepository.save(Board.create(itemsDto));
-            itemsDtoList.add(itemsDto);
+            if(!links.contains(itemsDto.getLink())){
+                boardList.add(Board.create(itemsDto));
+            }
         }
-        return itemsDtoList;
+        boardList = DeduplicationUtils.deduplication(boardList,Board::getLink);
+        boardRepository.saveAll(boardList);
     }
 
 
