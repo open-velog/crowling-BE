@@ -1,11 +1,9 @@
 package com.example.finding.repository;
 
-import com.example.finding.entity.Blog;
+import com.example.finding.entity.Board;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
-
-public interface BlogRepository extends JpaRepository<Blog, Long> {
+public interface BoardRepository extends JpaRepository<Board, Long> {
    // Optional<Blog> findByBlog(Blog blog);
 
 }

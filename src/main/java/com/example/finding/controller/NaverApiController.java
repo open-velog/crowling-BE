@@ -18,7 +18,7 @@ public class NaverApiController {
     private final NaverApiService naverApiService;
 
     @GetMapping("/search")
-    public List<ItemsDto> searchItems(@RequestParam String query)  {
+    public List<ItemsDto> searchItems(String query)  {
         return naverApiService.searchItems(query);
     }
 }

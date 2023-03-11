@@ -13,11 +13,11 @@ import javax.validation.constraints.Pattern;
 public class ItemsDto {
     private String title;
     private String link;
-    private String description;
+    private String content;
 
     public ItemsDto(JSONObject itemJson) {
-        this.title = itemJson.getString("title");
-        this.link = itemJson.getString("link");
-        this.description = itemJson.getString("description");
+        this.title = itemJson.getString("title").replaceAll("[<^>*.]", " ");
+        this.link = itemJson.getString("link").replaceAll("[<^>*.]", " ");
+        this.content = itemJson.getString("description").replaceAll("[<^>*.]", " ");
     }
 }
