@@ -33,8 +33,8 @@ public class NaverApiService {
     public void searchItems() {
         RestTemplate rest = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Naver-Client-Id", "wyCvLvhOWDeW6BC20eNt");
-        headers.add("X-Naver-Client-Secret", "gWTeNvJoWW");
+        headers.add("X-Naver-Client-Id", "${NAVER_CLIENT_ID}");
+        headers.add("X-Naver-Client-Secret", "${NAVER_CLIENT_SECRET}");
         String body = "";
 
         List<Keyword> keywordList = keywordRepository.findByIdBetween(29001L,30000L);
