@@ -9,12 +9,14 @@ import com.example.finding.utils.DeduplicationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +29,7 @@ public class NaverApiService {
     private final BoardRepository boardRepository;
 
     private final KeywordRepository keywordRepository;
-    @Transactional
+
     public void searchItems() {
         RestTemplate rest = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -35,7 +37,7 @@ public class NaverApiService {
         headers.add("X-Naver-Client-Secret", "gWTeNvJoWW");
         String body = "";
 
-        List<Keyword> keywordList = keywordRepository.findByIdBetween(2L,100L);
+        List<Keyword> keywordList = keywordRepository.findByIdBetween(29001L,30000L);
         for (Keyword keyword:keywordList){
             List<Board> boards=boardRepository.findAll();
             Set<String> links = new HashSet<>();
@@ -48,6 +50,7 @@ public class NaverApiService {
             HttpStatus httpStatus = responseEntity.getStatusCode();
             int status = httpStatus.value();
             log.info("NAVER API Status Code : " + status);
+            log.info("keyword : {}",keyword.getKeyword());
 
             String response = responseEntity.getBody();
             fromJSONtoItems(response, links);
@@ -57,18 +60,25 @@ public class NaverApiService {
     //파싱 파트
     public void fromJSONtoItems(String response, Set<String> links) {
         JSONObject rjson = new JSONObject(response);
-        JSONArray items  = rjson.getJSONArray("items");
-        List<Board> boardList = new ArrayList<>();
-        log.info(""+items.length());
-        for (int i=0; i<items.length(); i++) {
-            JSONObject itemJson = items.getJSONObject(i);
-            ItemsDto itemsDto = new ItemsDto(itemJson);
-            if(!links.contains(itemsDto.getLink())){
-                boardList.add(Board.create(itemsDto));
+        try {
+            JSONArray items = rjson.getJSONArray("items");
+            List<Board> boardList = new ArrayList<>();
+            log.info("" + items.length());
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject itemJson = items.getJSONObject(i);
+                ItemsDto itemsDto = new ItemsDto(itemJson);
+                if (!links.contains(itemsDto.getLink())) {
+                    boardList.add(Board.create(itemsDto));
+                }
             }
+//        boardList = DeduplicationUtils.deduplication(boardList,Board::getLink);
+
+            boardRepository.saveAll(boardList);
+//        }catch (JSONException e) {
+        }catch (Exception e) {
+            e.printStackTrace();
         }
-        boardList = DeduplicationUtils.deduplication(boardList,Board::getLink);
-        boardRepository.saveAll(boardList);
+
     }
 
 
