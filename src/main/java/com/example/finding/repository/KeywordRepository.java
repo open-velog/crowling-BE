@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface KeywordRepository extends JpaRepository<Keyword, Long> {
     List<Keyword> findByIdBetween(Long id1, Long id2);
+    List<Keyword> findByIdGreaterThan(Long keywordId);
 }
