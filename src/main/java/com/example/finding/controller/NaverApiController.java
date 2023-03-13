@@ -17,6 +17,11 @@ public class NaverApiController {
 
     private final NaverApiService naverApiService;
 
+    @GetMapping("/csv")
+    public void writeCSV()  {
+        naverApiService.writeCSV();
+    }
+
     @GetMapping("/search")
     public void searchItems()  {
         naverApiService.searchItems();

@@ -35,4 +35,6 @@ out/
 
 ### VS Code ###
 application-db.properties
+application-dev.properties
+/csv-files
 .vscode/
