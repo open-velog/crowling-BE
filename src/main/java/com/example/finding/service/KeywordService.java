@@ -40,7 +40,7 @@ public class KeywordService {
 
             }
             keywordRepository.saveAll(keywordList);
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
