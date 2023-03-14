@@ -23,13 +23,15 @@ public class NaverApiUtils {
     private HttpEntity<String> requestEntity;
 
     private String naverTagetApiUrl;
+
     private String naverClientSecret;
+
     private String naverClientId;
 
     @Autowired
-    public NaverApiUtils(@Value("${NAVER_API_URL}") String naverTagetApiUrl,
-                         @Value("${NAVER_CLIENT_SECRET}") String naverClientSecret,
-                         @Value("${NAVER_CLIENT_ID}") String naverClientId) {
+    public NaverApiUtils(@Value("${naver.api.url}") String naverTagetApiUrl,
+                         @Value("${naver.client.id}") String naverClientId,
+                         @Value("${naver.client.secret}") String naverClientSecret) {
         this.naverTagetApiUrl = naverTagetApiUrl;
         this.naverClientSecret = naverClientSecret;
         this.naverClientId = naverClientId;
