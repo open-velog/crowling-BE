@@ -5,6 +5,7 @@ import com.example.finding.entity.Board;
 import com.example.finding.entity.Keyword;
 import com.example.finding.dto.ItemsDto;
 import com.example.finding.repository.KeywordRepository;
+import com.example.finding.utils.CsvImportUtils;
 import com.example.finding.utils.CsvUtils;
 import com.example.finding.utils.NaverApiUtils;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class NaverApiService {
     private final CsvUtils csvUtils;
 
     private final NaverApiUtils naverApiUtils;
+    private final CsvImportUtils csvImportUtils;
 
     private final KeywordRepository keywordRepository;
 
@@ -115,42 +117,7 @@ public class NaverApiService {
 
     @Transactional
     public void transferSearchResultsToDatabase() {
-//        RestTemplate rest = new RestTemplate();
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("X-Naver-Client-Id", "wyCvLvhOWDeW6BC20eNt");
-//        headers.add("X-Naver-Client-Secret", "B9xPFn77Rv");
-//        String body = "";
-//
-//        List<Keyword> keywordList = keywordRepository.findByIdBetween(ConstantTable.START_KEYWORD_ID, ConstantTable.BATCH_SIZE);
-//        HashSet<String> linkSet = getUniqueLinkSetFromDatabase();
-//
-//        List<Board> batchBoards = new ArrayList<>((int)ConstantTable.BATCH_SIZE);
-//        for (Keyword keyword:keywordList) {
-//            HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
-//            ResponseEntity<String> responseEntity = rest.exchange("https://openapi.naver.com/v1/search/blog.json?display=100&query=" + keyword.getKeyword(), HttpMethod.GET, requestEntity, String.class);
-//
-//            HttpStatus httpStatus = responseEntity.getStatusCode();
-//            int status = httpStatus.value();
-//            log.info("NAVER API Status Code : {} keyword's id : {}, keyword: {} batchBoard's size : {}",
-//                    status, keyword.getId(), keyword.getKeyword(), batchBoards.size());
-//
-//            // API 너무 빠르게 호출하면 Ban 먹기때문에, 일부러 interval 를 두었음
-//            try {
-//                Thread.sleep(ConstantTable.INTERVAL);
-//            }
-//            catch (InterruptedException e) {
-//
-//            }
-//
-//            String response = responseEntity.getBody();
-//            fromJSONtoItems(response, batchBoards, linkSet);
-//
-//            if (batchBoards.size() > ConstantTable.BATCH_SIZE) {
-//                log.debug("added at last keyword: " + keyword);
-//                boardRepository.saveAll(batchBoards);
-//                batchBoards.clear();
-//            }
-//        }
+        csvImportUtils.loadCsvFile();
     }
 
 }
