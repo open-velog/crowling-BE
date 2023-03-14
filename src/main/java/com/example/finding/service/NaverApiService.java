@@ -38,14 +38,10 @@ public class NaverApiService {
 
         try {
             FileWriter csvWriter = csvUtils.getNewCsvFileWriter();
-            csvUtils.writeOneLineToCsv(csvWriter, "id", "link", "title", "content");    // set column
+            csvUtils.writeOneLineToCsv(csvWriter, "link", "title", "content");    // set column
 
             for (Keyword keyword : keywordList) {
-                if (insertionCount == 0) {
-                    csvUtils.endCsvWriter(csvWriter);
-                    csvWriter = csvUtils.getNewCsvFileWriter();
-                }
-
+                log.info("Insertion: keyword_id={}, keyword={}, insertion count={}", keyword.getId(), keyword.getKeyword(), insertionCount);
                 ResponseEntity<String> responseEntity = naverApiUtils.getSearchResultsByKeyword(keyword.getKeyword());
 
                 // Naver Api blocks requesting too often
@@ -61,7 +57,7 @@ public class NaverApiService {
                 for (Board fetchedBoard : fetchedBoards) {
                     // row insert
                     csvUtils.writeOneLineToCsv(
-                            csvWriter, Long.toString(fetchedBoard.getId()), fetchedBoard.getLink(), fetchedBoard.getTitle(), fetchedBoard.getContent()
+                            csvWriter, fetchedBoard.getLink(), fetchedBoard.getTitle(), fetchedBoard.getContent()
                     );
                     ++insertionCount;
                 }
@@ -69,6 +65,11 @@ public class NaverApiService {
                 if (insertionCount >= ConstantTable.BATCH_SIZE) {
                     log.info("Last insertion: keyword_id={}, keyword={}, insertion count={}", keyword.getId(), keyword.getKeyword(), insertionCount);
                     insertionCount = 0;
+                }
+
+                if (insertionCount == 0) {
+                    csvUtils.endCsvWriter(csvWriter);
+                    csvWriter = csvUtils.getNewCsvFileWriter();
                 }
             }
 
