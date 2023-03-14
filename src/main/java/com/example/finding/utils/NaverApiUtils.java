@@ -1,6 +1,7 @@
 package com.example.finding.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
@@ -14,7 +15,6 @@ import org.springframework.http.*;
 @Slf4j
 @Component
 @Lazy
-@PropertySource("classpath:/application-dev.properties")
 public class NaverApiUtils {
     private RestTemplate rest;
 
@@ -22,24 +22,28 @@ public class NaverApiUtils {
 
     private HttpEntity<String> requestEntity;
 
-    @Value("${NAVER_CLIENT_ID}")
+    private String naverTagetApiUrl;
+    private String naverClientSecret;
     private String naverClientId;
 
-    @Value("${NAVER_API_URL}")
-    private String naverTagetApiUrl;
+    @Autowired
+    public NaverApiUtils(@Value("${NAVER_API_URL}") String naverTagetApiUrl,
+                         @Value("${NAVER_CLIENT_SECRET}") String naverClientSecret,
+                         @Value("${NAVER_CLIENT_ID}") String naverClientId) {
+        this.naverTagetApiUrl = naverTagetApiUrl;
+        this.naverClientSecret = naverClientSecret;
+        this.naverClientId = naverClientId;
 
-    @Value("${NAVER_CLIENT_SECRET}")
-    private String naverClientSecret;
-
-    NaverApiUtils() {
-        rest = new RestTemplate();
-        headers = new HttpHeaders();
-        headers.add("X-Naver-Client-Id", naverClientId);
-        headers.add("X-Naver-Client-Secret", naverClientSecret);
-        requestEntity = new HttpEntity("", headers);
+        this.headers = new HttpHeaders();
+        this.headers.add("X-Naver-Client-Id", naverClientId);
+        this.headers.add("X-Naver-Client-Secret", naverClientSecret);
+        this.requestEntity = new HttpEntity("", headers);
+        this.rest = new RestTemplate();
     }
 
     public ResponseEntity<String> getSearchResultsByKeyword(String keyword) {
-        return rest.exchange(naverTagetApiUrl + keyword, HttpMethod.GET, requestEntity, String.class);
+        ResponseEntity<String> responseEntity = rest.exchange(naverTagetApiUrl + keyword, HttpMethod.GET, requestEntity, String.class);
+        log.info("Naver Api status code: {}", responseEntity.getStatusCode());
+        return responseEntity;
     }
 }

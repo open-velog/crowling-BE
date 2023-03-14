@@ -61,14 +61,19 @@ public class CsvUtils {
             File file = new File(filePath);
 
             if (file.exists()) {
-                log.debug(filePath + " file exists");
+                log.debug(filePath + " file already exists.");
+            }
+            else {
+                log.debug(filePath + " will be created.");
+
                 try {
                     return new FileWriter(file, Charset.forName("UTF-8"));
-                } catch (IOException e) {
-                    log.error("Can't make FileWriter of csv");
                 }
-            } else {
-                log.debug(filePath + " file does not exist");
+                catch (IOException e) {
+                    log.error("Can't make csv file: {}", filePath);
+                    e.printStackTrace();
+                }
+
             }
         }
 
