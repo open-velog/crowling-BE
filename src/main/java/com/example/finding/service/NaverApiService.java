@@ -70,6 +70,7 @@ public class NaverApiService {
                 if (insertionCount == 0) {
                     csvUtils.endCsvWriter(csvWriter);
                     csvWriter = csvUtils.getNewCsvFileWriter();
+                    csvUtils.writeOneLineToCsv(csvWriter, "link", "title", "content");    // set column
                 }
             }
 
