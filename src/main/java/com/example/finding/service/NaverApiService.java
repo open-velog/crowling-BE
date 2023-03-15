@@ -1,6 +1,5 @@
 package com.example.finding.service;
 
-import com.example.finding.constant.ConstantTable;
 import com.example.finding.entity.Board;
 import com.example.finding.entity.Keyword;
 import com.example.finding.dto.ItemsDto;
@@ -13,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,12 +30,22 @@ public class NaverApiService {
     private final CsvUtils csvUtils;
 
     private final NaverApiUtils naverApiUtils;
+
     private final CsvImportUtils csvImportUtils;
 
     private final KeywordRepository keywordRepository;
 
+    @Value("${search.api.start.keyword.id}")
+    private Long searchApiStartKeywordId;
+
+    @Value("${search.api.batch.size}")
+    private Long searchApiBatchSize;
+
+    @Value("${search.api.interval}")
+    private Long searchApiInterval;
+
     public void transferSerachResultsToCsv() {
-        List<Keyword> keywordList = keywordRepository.findByIdGreaterThan(ConstantTable.START_KEYWORD_ID);
+        List<Keyword> keywordList = keywordRepository.findByIdGreaterThan(searchApiStartKeywordId);
         int insertionCount = 0;
 
         try {
@@ -49,7 +59,7 @@ public class NaverApiService {
                 // Naver Api blocks requesting too often
                 // So added interval for every request
                 try {
-                    Thread.sleep(ConstantTable.INTERVAL);
+                    Thread.sleep(searchApiInterval);
                 } catch (InterruptedException e) {
 
                 }
@@ -64,7 +74,7 @@ public class NaverApiService {
                     ++insertionCount;
                 }
 
-                if (insertionCount >= ConstantTable.BATCH_SIZE) {
+                if (insertionCount >= searchApiBatchSize) {
                     log.info("Last insertion: keyword_id={}, keyword={}, insertion count={}", keyword.getId(), keyword.getKeyword(), insertionCount);
                     insertionCount = 0;
                 }
